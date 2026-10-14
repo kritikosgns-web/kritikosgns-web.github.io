@@ -1,0 +1,23 @@
+name: Pol Cloud Autonomous Daemon
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "pol_engine.py"
+      - ".github/workflows/pol_cloud.yml"
+jobs:
+  autonomous-cycle:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Cloud Repo
+        uses: actions/checkout@v4
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Execute Pol Cloud Optimization Cycle
+        run: python pol_engine.py
