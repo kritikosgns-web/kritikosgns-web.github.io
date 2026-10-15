@@ -3,6 +3,8 @@ on:
   schedule:
     - cron: "0 */6 * * *"
   workflow_dispatch:
+  issues:
+    types: [opened, edited]
   push:
     branches:
       - main
@@ -10,6 +12,7 @@ on:
       - "pol_engine.py"
 permissions:
   contents: write
+  issues: write
 jobs:
   autonomous-cycle:
     runs-on: ubuntu-latest
@@ -20,11 +23,13 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Execute Pol Cloud Optimization Cycle
+      - name: Execute Pol Self-Evolving Engine
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python pol_engine.py
-      - name: Commit and Push Live Dashboard and SEO Assets
+      - name: Commit All Autonomous Deployments
         run: |
-          git config user.name "Pol Cloud Daemon"
+          git config user.name "Pol Autonomous AI"
           git config user.email "actions@github.com"
-          git add *.html sitemap.xml
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update dashboard, pricing & SEO pages" && git push)
+          git add -A
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Autonomous AI Self-Deployment" && git push)
