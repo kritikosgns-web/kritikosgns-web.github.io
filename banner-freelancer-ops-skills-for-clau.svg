@@ -1,0 +1,12 @@
+<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
+  <rect width="100%" height="100%" fill="#0f172a"/>
+  <rect x="20" y="20" width="760" height="360" rx="15" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+  <text x="50" y="80" font-family="system-ui, sans-serif" font-size="20" fill="#10b981" font-weight="bold" letter-spacing="2">SECOPS</text>
+  <text x="50" y="160" font-family="system-ui, sans-serif" font-size="40" fill="#f8fafc" font-weight="900">Freelancer Ops Skills for Claude</text>
+  <text x="50" y="215" font-family="system-ui, sans-serif" font-size="40" fill="#f8fafc" font-weight="900"> Code (10 installable skills)</text>
+  <path d="M50 260 h 700" stroke="#38bdf8" stroke-width="2" stroke-dasharray="8 4"/>
+  <rect x="50" y="290" width="600" height="45" rx="6" fill="#020617"/>
+  <text x="70" y="318" font-family="monospace" font-size="16" fill="#38bdf8">$ pip install fastapi uvicorn &amp;&amp; n8n import</text>
+  <rect x="620" y="45" width="130" height="45" rx="8" fill="#f59e0b"/>
+  <text x="635" y="73" font-family="system-ui, sans-serif" font-size="18" fill="#000000" font-weight="bold">FLASH 25 EUR</text>
+</svg>
