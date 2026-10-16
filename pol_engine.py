@@ -127,21 +127,21 @@ def get_dynamic_pricing(prod):
         off_cents = 2800
         btn_price = "19 EUR" if sales < 3 else ("29 EUR" if sales < 9 else "47 EUR")
         desc = "Filters 100+ free email providers, live-scrapes corporate domains without paid APIs, scores ICP fit (0-100) via GPT-4o-mini, and drafts 1-click Slack replies in 2.5 seconds."
-        compare_link = '<a style="color:#38bdf8;margin-left:15px" href="https://kritikosgns-web.github.io/clearbit-clay-alternative-n8n.html">Compare vs Clearbit/Clay →</a>'
+        compare_link = '<a style="color:#38bdf8;margin-left:15px" href="https://kritikosgns-web.github.io/clearbit-clay-alternative-n8n.html">Compare vs Clearbit/Clay &rarr;</a>'
     elif "eqdqfx" in purl or "invoice" in pname or "ocr" in pname:
         ptype = "invoice"
         code = "INVOICE21" if sales < 3 else ("INVOICE34" if sales < 9 else "")
         off_cents = 2800
         btn_price = "21 EUR" if sales < 3 else ("34 EUR" if sales < 9 else "49 EUR")
         desc = "Extracts structured JSON data (VAT, Tax ID, Line Items, Totals) from messy supplier PDF invoices using Python FastAPI + OpenAI Vision and syncs directly to Google Sheets/ERP."
-        compare_link = '<a style="color:#38bdf8;margin-left:15px" href="https://kritikosgns-web.github.io/guide-automated-pdf-invoice-ocr-n8n-openai-vision.html">View OCR Architecture →</a>'
+        compare_link = '<a style="color:#38bdf8;margin-left:15px" href="https://kritikosgns-web.github.io/guide-automated-pdf-invoice-ocr-n8n-openai-vision.html">View OCR Architecture &rarr;</a>'
     else:
         ptype = "secops"
         code = "SECOPS25" if sales < 3 else ("SECOPS39" if sales < 9 else "")
         off_cents = 3400
         btn_price = "25 EUR" if sales < 3 else ("39 EUR" if sales < 9 else "59 EUR")
         desc = "Eliminate 80% of SOC alert fatigue. Ingests SIEM/WAF webhooks, scores SQLi/LFI/Brute-Force payloads, filters false positives, and outputs instant WAF block actions."
-        compare_link = '<a style="color:#38bdf8;margin-left:15px" href="https://kritikosgns-web.github.io/secops-siem-waf-alert-triage-n8n.html">View SecOps Architecture →</a>'
+        compare_link = '<a style="color:#38bdf8;margin-left:15px" href="https://kritikosgns-web.github.io/secops-siem-waf-alert-triage-n8n.html">View SecOps Architecture &rarr;</a>'
 
     if sales < 3 and code:
         ensure_offer_code(pid, code, off_cents)
@@ -155,28 +155,25 @@ def get_dynamic_pricing(prod):
     return ptype, promo_url, tier_label, btn_price, sales, desc, compare_link
 
 def spawn_open_source_cli():
-    cli_code = """#!/usr/bin/env python3
-\"\"\"
-n8n-fastapi-cli: Free Open-Source Webhook Load Tester & Debugger for n8n + FastAPI
-Enterprise Production Blueprints: https://kritikosgns-web.github.io
-\"\"\"
-import sys, time, json, urllib.request
-
-def test_webhook(url, payload):
-    print(f"[*] Sending test webhook to {url}...")
-    t0 = time.time()
-    req = urllib.request.Request(url, data=json.dumps(payload).encode(), headers={"Content-Type": "application/json"}, method="POST")
-    try:
-        with urllib.request.urlopen(req, timeout=10) as r:
-            dt = (time.time() - t0) * 1000
-            print(f"[+] Status: {r.status} | Latency: {dt:.1f}ms | Response: {r.read().decode()[:200]}")
-    except Exception as e:
-        print(f"[-] Webhook Error: {e}")
-
-if __name__ == "__main__":
-    target = sys.argv[1] if len(sys.argv) > 1 else "http://localhost:8000/webhook"
-    test_webhook(target, {"event": "test_ping", "source": "n8n-fastapi-cli"})
-"""
+    cli_code = (
+        "#!/usr/bin/env python3\n"
+        '"""n8n-fastapi-cli: Free Open-Source Webhook Load Tester & Debugger\n'
+        'Enterprise Blueprints: https://kritikosgns-web.github.io\n"""\n'
+        "import sys, time, json, urllib.request\n\n"
+        "def test_webhook(url, payload):\n"
+        '    print(f"[*] Sending test webhook to {url}...")\n'
+        "    t0 = time.time()\n"
+        '    req = urllib.request.Request(url, data=json.dumps(payload).encode(), headers={"Content-Type": "application/json"}, method="POST")\n'
+        "    try:\n"
+        "        with urllib.request.urlopen(req, timeout=10) as r:\n"
+        "            dt = (time.time() - t0) * 1000\n"
+        '            print(f"[+] Status: {r.status} | Latency: {dt:.1f}ms | Response: {r.read().decode()[:200]}")\n'
+        "    except Exception as e:\n"
+        '        print(f"[-] Webhook Error: {e}")\n\n'
+        'if __name__ == "__main__":\n'
+        '    target = sys.argv[1] if len(sys.argv) > 1 else "http://localhost:8000/webhook"\n'
+        '    test_webhook(target, {"event": "test_ping", "source": "n8n-fastapi-cli"})\n'
+    )
     with open("n8n-fastapi-cli.py", "w", encoding="utf-8") as f:
         f.write(cli_code)
 
@@ -264,91 +261,10 @@ def run_cycle():
     guide_list_dash = "".join(f'<li><a href="https://kritikosgns-web.github.io/{g}">{g}</a></li>' for g in all_guides)
     now_str = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
 
-    dash_html = f"""<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pol Cloud Live Dashboard v5.0</title><style>body{{font-family:system-ui,sans-serif;background:#0f172a;color:#f8fafc;padding:24px;max-width:920px;margin:0 auto}}.box{{background:#1e293b;padding:20px;border-radius:10px;margin-bottom:18px;border:1px solid #334155}}.btn{{display:inline-block;background:#38bdf8;color:#0f172a;padding:10px 18px;border-radius:6px;text-decoration:none;font-weight:bold;margin-top:8px}}h2{{color:#38bdf8;margin-top:0}}a{{color:#10b981;font-weight:bold}}</style></head><body><h1>POL AUTONOMOUS ENGINE v5.0 (FULL 3-PRODUCT DYNAMIC SUITE)</h1><div class="box"><h2>1. 1-Click Operator Command Center</h2><p>Send a new keyword or product topic via Issue Title (automatically triggers deployment):</p><a class="btn" href="https://github.com/kritikosgns-web/kritikosgns-web.github.io/issues/new?title=deploy+ai+customer+support+webhook+triage+n8n">⚡ 1-Click Deploy New SEO Page via Issue</a></div><div class="box"><h2>2. Live Gumroad Portfolio & Auto-Pricing Status</h2><p><b>Active Products:</b> {len(prods)} | <b>Total Sales:</b> {total_sales} | <b>Net Revenue:</b> {total_rev:.2f} USD (Goal: 1,000 EUR/mo)</p>{rows}</div><div class="box"><h2>3. Live Market Radar (Filtered B2B Buyer Signals)</h2><ul>{signal_html}</ul></div><div class="box"><h2>4. Auto-Spawned B2B SEO Pages ({len(all_guides) + 3} Clean Pages Indexed)</h2><p><b>Last Cloud Cycle:</b> {now_str}</p><p><b>Main Storefront (All 3 Products + Free CLI):</b> <a href="https://kritikosgns-web.github.io">https://kritikosgns-web.github.io</a></p><ul><li><a href="https://kritikosgns-web.github.io/clearbit-clay-alternative-n8n.html">clearbit-clay-alternative-n8n.html</a></li><li><a href="https://kritikosgns-web.github.io/secops-siem-waf-alert-triage-n8n.html">secops-siem-waf-alert-triage-n8n.html</a></li><li><a href="https://kritikosgns-web.github.io/zapier-make-alternative-n8n-python.html">zapier-make-alternative-n8n-python.html</a></li>{guide_list_dash}</ul></div></body></html>"""
-
+    dash_html = f"""<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pol Cloud Live Dashboard v5.0</title><style>body{{font-family:system-ui,sans-serif;background:#0f172a;color:#f8fafc;padding:24px;max-width:920px;margin:0 auto}}.box{{background:#1e293b;padding:20px;border-radius:10px;margin-bottom:18px;border:1px solid #334155}}.btn{{display:inline-block;background:#38bdf8;color:#0f172a;padding:10px 18px;border-radius:6px;text-decoration:none;font-weight:bold;margin-top:8px}}h2{{color:#38bdf8;margin-top:0}}a{{color:#10b981;font-weight:bold}}</style></head><body><h1>POL AUTONOMOUS ENGINE v5.0 (FULL 3-PRODUCT DYNAMIC SUITE)</h1><div class="box"><h2>1. 1-Click Operator Command Center</h2><p>Send a new keyword or product topic via Issue Title (automatically triggers deployment):</p><a class="btn" href="https://github.com/kritikosgns-web/kritikosgns-web.github.io/issues/new?title=deploy+ai+customer+support+webhook+triage+n8n">⚡ 1-Click Deploy New SEO Page via Issue</a></div><div class="box"><h2>2. Live Gumroad Portfolio & Auto-Pricing Status</h2><p><b>Active Products:</b> {len(prods)} | <b>Total Sales:</b> {total_sales} | <b>Net Revenue:</b> {total_rev:.2f} USD (Goal: 1,000 EUR/mo)</p>{rows}</div><div class="box"><h2>3. Live Market Radar (Filtered B2B Buyer Signals)</h2><ul>{signal_html}</ul></div><div class="box"><h2>4. Auto-Spawned B2B SEO Pages ({len(all_guides) + 3} Clean Pages Indexed)</h2><p><b>Last Cloud Cycle:</b> {now_str}</p><p><b>Main Storefront (All 3 Products + Free CLI):</b> <a href="https://kritikosgns-web.github.io">https://kritikosgns-web.github.io</a></p><ul><li><a href="https://kritikosgns-web.github.io/clearbit-clay-alternative-n8n.html">clearbit-clay-alternative-n8n.html</a></li><li><a href="https://kritikosgns-web.github.io/secops-siem-waf-alert-triage-n8n.html">secops-siem-waf-alert-triage-n8n.html</a></li><li><a href="https://kritikosgns-web.github.io/zapier-make-alternative-n8n-python.html">zapier-make-alternative-n8n-python.html</a></li>{guide_list_dash}</ul></div></body></html>"
     with open("dashboard.html", "w", encoding="utf-8") as f:
         f.write(dash_html)
     print(f"Pol Engine v5.0 completed. Products rendered: {len(prods)}, Clean guides: {len(all_guides)}")
-
-if __name__" style="color:#10b981">2.25 EUR / month</b></p><p style="font-size:1.2rem">Your Annual Savings: <b id="yearSave" style="color:#10b981">4,173 EUR / year</b></p></div>
-<script>function updateRoi(v){{document.getElementById('volLabel').innerText=Number(v).toLocaleString();var saas=Math.round(v*0.07);var self=(v*0.00045).toFixed(2);var save=Math.round((saas-self)*12);document.getElementById('saasCost').innerText=saas+' EUR / month';document.getElementById('selfCost').innerText=self+' EUR / month';document.getElementById('yearSave').innerText=save.toLocaleString()+' EUR / year';}}</script>
-<div class="card"><span class="badge">EARLY ADOPTER FLASH TIER ACTIVE (FIRST 3 COPIES)</span><h2>1. B2B Lead Triage & AI Enrichment Engine</h2><p>Filters 100+ free email providers, live-scrapes corporate domains without paid APIs, scores ICP fit (0-100) via GPT-4o-mini, and drafts 1-click Slack replies in 2.5 seconds.</p><a class="btn" href="{lead_url}">Get Lead Enrichment Engine ({lead_price} - Instant Download)</a> <a style="color:#38bdf8;margin-left:15px" href="https://kritikosgns-web.github.io/clearbit-clay-alternative-n8n.html">Compare vs Clearbit/Clay</a></div>
-<div class="card"><span class="badge">EARLY ADOPTER FLASH TIER ACTIVE (FIRST 3 COPIES)</span><h2>2. Automated SecOps SIEM & WAF Alert Triage Engine</h2><p>Eliminate 80% of SOC alert fatigue. Ingests SIEM/WAF webhooks, scores SQLi/LFI/Brute-Force payloads, filters false positives, and outputs instant WAF block actions.</p><a class="btn" href="{secops_url}">Get SecOps Alert Triage Engine ({secops_price} - Instant Download)</a> <a style="color:#38bdf8;margin-left:15px" href="https://kritikosgns-web.github.io/secops-siem-waf-alert-triage-n8n.html">View SecOps Architecture</a></div>
-<div class="card"><h2>Technical Implementation & Migration Guides ({len(all_guides)+3} Active Blueprints)</h2><ul><li><a style="color:#38bdf8" href="https://kritikosgns-web.github.io/clearbit-clay-alternative-n8n.html">Self-Hosted Clearbit & Clay Alternative</a></li><li><a style="color:#38bdf8" href="https://kritikosgns-web.github.io/secops-siem-waf-alert-triage-n8n.html">Automated SecOps SIEM & WAF Alert Triage</a></li><li><a style="color:#38bdf8" href="https://kritikosgns-web.github.io/zapier-make-alternative-n8n-python.html">Zapier & Make vs Self-Hosted n8n + FastAPI</a></li>{guide_links_html}</ul></div></body></html>"""
-    with open("index.html", "w", encoding="utf-8") as f:
-        f.write(idx_html)
-
-    base_urls = [
-        "https://kritikosgns-web.github.io/",
-        "https://kritikosgns-web.github.io/clearbit-clay-alternative-n8n.html",
-        "https://kritikosgns-web.github.io/secops-siem-waf-alert-triage-n8n.html",
-        "https://kritikosgns-web.github.io/zapier-make-alternative-n8n-python.html"
-    ] + [f"https://kritikosgns-web.github.io/{g}" for g in all_guides]
-
-    url_entries = "".join(f"  <url><loc>{u}</loc><priority>0.9</priority></url>\n" for u in base_urls)
-    sitemap = f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n{url_entries}</urlset>'
-    with open("sitemap.xml", "w", encoding="utf-8") as f:
-        f.write(sitemap)
-
-def run_cycle():
-    extra_cmds = check_operator_commands()
-    req = urllib.request.Request(f"https://api.gumroad.com/v2/products?access_token={GUMROAD_TOKEN}")
-    with urllib.request.urlopen(req) as resp:
-        prods = json.loads(resp.read().decode()).get("products", [])
-
-    signals, raw_keywords = fetch_live_market_radar(extra_cmds)
-    signal_html = "".join(f"<li style='margin-bottom:6px'>{s}</li>" for s in signals)
-
-    total_sales = sum(int(p.get("sales_count", 0)) for p in prods)
-    total_rev = sum(float(p.get("sales_usd_cents", 0)) / 100.0 for p in prods)
-
-    hour_slot = datetime.datetime.utcnow().hour % 4
-    titles = [
-        "B2B Lead Triage & AI Enrichment Engine (n8n + Python)",
-        "Self-Hosted Clearbit & Clay Alternative (Python FastAPI + n8n)",
-        "Automated Inbound Lead Scoring & Slack Triage Blueprint (n8n + AI)",
-        "FastAPI + n8n B2B Domain Scraper & AI Lead Qualifier"
-    ]
-
-    rows = ""
-    lead_url = "https://kritikos12.gumroad.com/l/qjimps/FLASH19"
-    lead_price = "19 EUR"
-    secops_url = "https://kritikos12.gumroad.com/l/qjimps/FLASH19"
-    secops_price = "25 EUR"
-
-    for p in prods:
-        pname = p.get("name", "")
-        prev = float(p.get("sales_usd_cents", 0)) / 100.0
-        purl = p.get("short_url", "")
-        promo_url, price_tier_label, btn_price, psales = get_dynamic_pricing(p)
-
-        if "qjimps" in purl:
-            lead_url = promo_url
-            lead_price = btn_price
-            if psales == 0:
-                pid = urllib.parse.quote(p["id"])
-                data = urllib.parse.urlencode({"access_token": GUMROAD_TOKEN, "name": titles[hour_slot]}).encode()
-                try:
-                    urllib.request.urlopen(urllib.request.Request(f"https://api.gumroad.com/v2/products/{pid}", data=data, method="PUT"))
-                except Exception:
-                    pass
-        else:
-            secops_url = promo_url
-            secops_price = btn_price
-
-        rows += f'<div style="padding:14px;border-bottom:1px solid #334155"><b>{pname}</b><br>Active Auto-Pricing Tier: <span style="color:#f59e0b;font-weight:bold">{price_tier_label}</span><br>Sales: <b>{psales}</b> | Revenue: <b>{prev:.2f} USD</b><br>Active Dynamic Checkout Link: <a style="color:#10b981" href="{promo_url}">{promo_url}</a></div>'
-
-    all_guides = auto_spawn_radar_pages(raw_keywords, lead_url, lead_price, secops_url, secops_price)
-    build_storefront_and_sitemap(lead_url, lead_price, secops_url, secops_price, all_guides)
-
-    guide_list_dash = "".join(f'<li><a href="https://kritikosgns-web.github.io/{g}">{g}</a></li>' for g in all_guides)
-    now_str = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
-
-    dash_html = f"""<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pol Cloud Live Dashboard v4.0</title><style>body{{font-family:system-ui,sans-serif;background:#0f172a;color:#f8fafc;padding:24px;max-width:920px;margin:0 auto}}.box{{background:#1e293b;padding:20px;border-radius:10px;margin-bottom:18px;border:1px solid #334155}}.btn{{display:inline-block;background:#38bdf8;color:#0f172a;padding:10px 18px;border-radius:6px;text-decoration:none;font-weight:bold;margin-top:8px}}h2{{color:#38bdf8;margin-top:0}}a{{color:#10b981;font-weight:bold}}</style></head><body><h1>POL AUTONOMOUS ENGINE v4.0 (ZERO-TOUCH CLOUD)</h1><div class="box"><h2>1. 1-Click Operator Command Center (Zero Code Copy-Paste)</h2><p>Send a new directive or approve a new topic with 1 click (automatically triggers deployment):</p><a class="btn" href="https://github.com/kritikosgns-web/kritikosgns-web.github.io/issues/new?title=deploy+automated+invoice+ocr+n8n+python&body=Approved+by+Operator">⚡ 1-Click Deploy New Topic via Issue</a></div><div class="box"><h2>2. Live Gumroad Portfolio & Auto-Pricing Status</h2><p><b>Active Products:</b> {len(prods)} | <b>Total Sales:</b> {total_sales} | <b>Net Revenue:</b> {total_rev:.2f} USD (Goal: 1,000 EUR/mo)</p>{rows}</div><div class="box"><h2>3. Live Market Radar (Real-Time Buyer Signals)</h2><ul>{signal_html}</ul></div><div class="box"><h2>4. Auto-Spawned SEO Pages ({len(all_guides) + 3} Live Pages Indexed)</h2><p><b>Last Cloud Cycle:</b> {now_str}</p><p><b>Main Storefront + Interactive ROI Calculator:</b> <a href="https://kritikosgns-web.github.io">https://kritikosgns-web.github.io</a></p><ul><li><a href="https://kritikosgns-web.github.io/clearbit-clay-alternative-n8n.html">clearbit-clay-alternative-n8n.html</a></li><li><a href="https://kritikosgns-web.github.io/secops-siem-waf-alert-triage-n8n.html">secops-siem-waf-alert-triage-n8n.html</a></li><li><a href="https://kritikosgns-web.github.io/zapier-make-alternative-n8n-python.html">zapier-make-alternative-n8n-python.html</a></li>{guide_list_dash}</ul></div></body></html>"""
-
-    with open("dashboard.html", "w", encoding="utf-8") as f:
-        f.write(dash_html)
-    print(f"Pol Engine v4.0 completed. Total auto-spawned guides: {len(all_guides)}")
 
 if __name__ == "__main__":
     run_cycle()
