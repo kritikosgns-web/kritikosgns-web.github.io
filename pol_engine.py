@@ -3,6 +3,21 @@ import os, re, glob, json, urllib.request, urllib.parse, datetime
 GUMROAD_TOKEN = "mBSxV_JH5SYm1t1qzwk" + "D58O6vQE1rI_qBYgY9v0TvSI"
 REPO = "kritikosgns-web/kritikosgns-web.github.io"
 GH_TOKEN = os.environ.get("GITHUB_TOKEN", "")
+ETSY_SHOP_URL = "https://www.etsy.com/shop/KritikosgnsStudio"
+
+# --- ETSY EXCLUSIVE LISTINGS ---
+ETSY_EXCLUSIVES = [
+    {
+        "name": "Claude Skills Bundle for Product Launch", 
+        "url": "https://www.etsy.com/listing/4597283831/claude-skills-bundle-for-product-launch", 
+        "desc": "Optimize your product launches with advanced Claude AI prompt engineering and custom skills."
+    },
+    {
+        "name": "Claude Code Skills Bundle", 
+        "url": "https://www.etsy.com/listing/4597264171/claude-code-skills-bundle-for", 
+        "desc": "Enhance your coding workflows, debugging, and AI-assisted development with specialized Claude code skills."
+    }
+]
 
 BANNED_WORDS = [
     "soil", "garden", "photos", "drive", "notion", 
@@ -12,14 +27,11 @@ BANNED_WORDS = [
 def clean_old_junk_guides():
     for g in glob.glob("guide-*.html"):
         if any(b.replace(" ", "-") in g for b in BANNED_WORDS):
-            try:
-                os.remove(g)
-            except Exception:
-                pass
+            try: os.remove(g)
+            except Exception: pass
 
 def check_operator_commands():
-    if not GH_TOKEN:
-        return []
+    if not GH_TOKEN: return []
     commands = []
     try:
         req = urllib.request.Request(
@@ -30,43 +42,20 @@ def check_operator_commands():
             issues = json.loads(r.read().decode())
             for iss in issues:
                 title = iss.get("title", "").strip()
-                num = iss.get("number")
-                if title:
-                    commands.append(title)
-                close_data = json.dumps({"state": "closed"}).encode()
+                if title: commands.append(title)
                 creq = urllib.request.Request(
-                    f"https://api.github.com/repos/{REPO}/issues/{num}",
-                    data=close_data,
-                    headers={
-                        "Authorization": f"Bearer {GH_TOKEN}",
-                        "User-Agent": "PolEngine",
-                        "Content-Type": "application/json"
-                    },
+                    f"https://api.github.com/repos/{REPO}/issues/{iss.get('number')}",
+                    data=json.dumps({"state": "closed"}).encode(),
+                    headers={"Authorization": f"Bearer {GH_TOKEN}", "User-Agent": "PolEngine", "Content-Type": "application/json"},
                     method="PATCH"
                 )
-                try:
-                    urllib.request.urlopen(creq, timeout=8)
-                except Exception:
-                    pass
-    except Exception:
-        pass
+                try: urllib.request.urlopen(creq, timeout=8)
+                except Exception: pass
+    except Exception: pass
     return commands
 
 def fetch_live_market_radar(extra_cmds):
     signals, raw_keywords = [], []
-    try:
-        q = urllib.parse.quote("n8n OR fastapi webhook automation")
-        req = urllib.request.Request(
-            f"https://api.github.com/search/repositories?q={q}&sort=stars&order=desc&per_page=5",
-            headers={"User-Agent": "PolMarketRadar"}
-        )
-        with urllib.request.urlopen(req, timeout=10) as r:
-            items = json.loads(r.read().decode()).get("items", [])
-            for it in items[:3]:
-                signals.append(f"GitHub Trend: {it.get('name')} ({it.get('stargazers_count')} stars)")
-    except Exception:
-        pass
-
     base_queries = ["n8n webhook ", "n8n python ", "siem alert automation ", "fastapi webhook ", "pdf invoice ocr python "]
     for cmd in extra_cmds:
         clean_cmd = re.sub(r"(?i)deploy\s+", "", cmd).strip()
@@ -75,30 +64,23 @@ def fetch_live_market_radar(extra_cmds):
             signals.append(f"Operator Directive: {clean_cmd}")
 
     cycle_offset = (datetime.datetime.utcnow().day + datetime.datetime.utcnow().hour) % len(base_queries)
-    selected_queries = (base_queries[cycle_offset:] + base_queries[:cycle_offset])[:4]
-
-    for q in selected_queries:
+    for q in (base_queries[cycle_offset:] + base_queries[:cycle_offset])[:4]:
         try:
             url = "https://suggestqueries.google.com/complete/search?client=firefox&q=" + urllib.parse.quote(q)
             req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
             with urllib.request.urlopen(req, timeout=8) as r:
-                sug = json.loads(r.read().decode())[1][:4]
-                clean_sug = [s for s in sug if not any(b in s.lower() for b in BANNED_WORDS)]
-                if clean_sug:
-                    signals.append("Google Intent: " + ", ".join(clean_sug[:3]))
-                    raw_keywords.extend(clean_sug[:3])
-        except Exception:
-            pass
+                sug = [s for s in json.loads(r.read().decode())[1][:4] if not any(b in s.lower() for b in BANNED_WORDS)]
+                if sug:
+                    signals.append("Google Intent: " + ", ".join(sug[:3]))
+                    raw_keywords.extend(sug[:3])
+        except Exception: pass
 
-    high_intent_defaults = ["microsoft sentinel soar playbook n8n python", "wazuh siem webhook alert triage n8n", "automated pdf invoice ocr n8n openai vision", "ai customer support webhook triage n8n"]
-    raw_keywords.extend(high_intent_defaults)
+    raw_keywords.extend(["microsoft sentinel soar playbook n8n python", "wazuh siem webhook alert triage n8n", "automated pdf invoice ocr n8n openai vision", "ai customer support webhook triage n8n"])
     return signals, raw_keywords
 
 def ensure_offer_code(prod_id, code_name, amount_off_cents):
     pid = urllib.parse.quote(prod_id)
-    data = urllib.parse.urlencode({
-        "access_token": GUMROAD_TOKEN, "name": code_name, "amount_off": str(amount_off_cents), "offer_type": "cents", "max_purchase_count": "3", "universal": "false"
-    }).encode()
+    data = urllib.parse.urlencode({"access_token": GUMROAD_TOKEN, "name": code_name, "amount_off": str(amount_off_cents), "offer_type": "cents", "max_purchase_count": "3", "universal": "false"}).encode()
     try: urllib.request.urlopen(urllib.request.Request(f"https://api.gumroad.com/v2/products/{pid}/offer_codes", data=data, method="POST"), timeout=10)
     except: pass
 
@@ -111,91 +93,59 @@ def get_dynamic_pricing(prod):
     if "qjimps" in purl or "lead" in pname:
         ptype, code, off_cents, btn_price = "lead", "FLASH19" if sales < 3 else "LAUNCH29" if sales < 9 else "", 2800, "19 EUR" if sales < 3 else "29 EUR" if sales < 9 else "47 EUR"
         desc = "Filters 100+ free email providers, live-scrapes domains without paid APIs, scores ICP fit via GPT-4o-mini."
-        compare_link = '<a style="color:#38bdf8;margin-left:15px" href="https://kritikosgns-web.github.io/clearbit-clay-alternative-n8n.html">Compare vs Clearbit/Clay &rarr;</a>'
     elif "eqdqfx" in purl or "invoice" in pname or "ocr" in pname:
         ptype, code, off_cents, btn_price = "invoice", "INVOICE21" if sales < 3 else "INVOICE34" if sales < 9 else "", 2800, "21 EUR" if sales < 3 else "34 EUR" if sales < 9 else "49 EUR"
         desc = "Extracts structured JSON data (VAT, Tax ID, Totals) from PDF invoices using Python FastAPI + OpenAI Vision."
-        compare_link = '<a style="color:#38bdf8;margin-left:15px" href="https://kritikosgns-web.github.io/guide-automated-pdf-invoice-ocr-n8n-openai-vision.html">View OCR Blueprint &rarr;</a>'
     elif "support" in pname or "ticket" in pname or "triage" in pname:
         ptype, code, off_cents, btn_price = "support", "SUPPORT19" if sales < 3 else "SUPPORT29" if sales < 9 else "", 2000, "19 EUR" if sales < 3 else "29 EUR" if sales < 9 else "39 EUR"
         desc = "Urgent support ticket triage. Ingests tickets, scores churn risk & sentiment, alerts Slack, and drafts AI replies."
-        compare_link = '<a style="color:#38bdf8;margin-left:15px" href="https://kritikosgns-web.github.io/guide-ai-customer-support-webhook-triage-n8n.html">View Support Blueprint &rarr;</a>'
     else:
         ptype, code, off_cents, btn_price = "secops", "SECOPS25" if sales < 3 else "SECOPS39" if sales < 9 else "", 3400, "25 EUR" if sales < 3 else "39 EUR" if sales < 9 else "59 EUR"
         desc = "Eliminate 80% of SOC alert fatigue. Ingests SIEM/WAF webhooks, scores SQLi/LFI payloads, and triggers instant WAF block actions."
-        compare_link = '<a style="color:#38bdf8;margin-left:15px" href="https://kritikosgns-web.github.io/secops-siem-waf-alert-triage-n8n.html">View SecOps Architecture &rarr;</a>'
 
     if sales < 3 and code: ensure_offer_code(pid, code, off_cents)
     tier_label = f"{btn_price} (Flash Tier)" if sales < 3 else f"{btn_price} (Growth Tier)" if sales < 9 else f"{btn_price} (Full Margin Tier)"
     promo_url = f"{purl}/{code}" if code else purl
-    return ptype, promo_url, tier_label, btn_price, sales, desc, compare_link
-
-def spawn_open_source_cli():
-    cli_code = (
-        "#!/usr/bin/env python3\nimport sys, time, json, urllib.request\n\ndef test_webhook(url, payload):\n"
-        "    print(f'[*] Sending test webhook to {url}...')\n    t0 = time.time()\n"
-        "    req = urllib.request.Request(url, data=json.dumps(payload).encode(), headers={'Content-Type': 'application/json'}, method='POST')\n"
-        "    try:\n        with urllib.request.urlopen(req, timeout=10) as r:\n"
-        "            dt = (time.time() - t0) * 1000\n            print(f'[+] Status: {r.status} | Latency: {dt:.1f}ms')\n"
-        "    except Exception as e:\n        print(f'[-] Webhook Error: {e}')\n\n"
-        "if __name__ == '__main__':\n"
-        "    target = sys.argv[1] if len(sys.argv) > 1 else 'http://localhost:8000/webhook'\n"
-        "    test_webhook(target, {'event': 'test_ping', 'source': 'n8n-fastapi-cli'})\n"
-    )
-    with open("n8n-fastapi-cli.py", "w", encoding="utf-8") as f:
-        f.write(cli_code)
+    return ptype, promo_url, tier_label, btn_price, sales, desc
 
 def build_github_readme(catalog_data):
     readme = (
         "# 🚀 Enterprise B2B Automation Suite (Self-Hosted)\n"
-        "[![GitHub release](https://img.shields.io/badge/release-v8.0-blue.svg)](#)\n"
-        "[![Python](https://img.shields.io/badge/Python-3.10%2B-green.svg)](#)\n"
-        "[![n8n](https://img.shields.io/badge/n8n-Compatible-orange.svg)](#)\n\n"
+        "[![GitHub release](https://img.shields.io/badge/release-v8.2-blue.svg)](#)\n"
         "Replace 300+ EUR/month SaaS subscriptions with self-hosted Python FastAPI microservices and 1-click importable n8n workflows.\n\n"
-        "## 📦 Production-Ready Engines\n"
+        "## 📦 Production-Ready Engines (Gumroad)\n"
     )
     for item in catalog_data:
-        readme += f"### {item['name']}\n"
-        readme += f"<a href='{item['url']}'><img src='{item['banner_url']}' alt='{item['name']}' width='600'></a>\n\n"
-        readme += f"> {item['desc']}\n\n"
-        readme += f"**[⚡ Download Blueprint ({item['price']})]({item['url']})**\n\n---\n\n"
+        readme += f"### {item['name']}\n> {item['desc']}\n**[⚡ Download Blueprint ({item['price']})]({item['url']})**\n\n---\n\n"
     
-    readme += (
-        "## 🛠️ Free Open-Source Utility\n"
-        "Test local n8n and FastAPI webhook latency with zero dependencies:\n"
-        "```bash\n"
-        "wget [https://kritikosgns-web.github.io/n8n-fastapi-cli.py](https://kritikosgns-web.github.io/n8n-fastapi-cli.py)\n"
-        "python3 n8n-fastapi-cli.py http://localhost:8000/webhook\n"
-        "```\n"
-    )
-    with open("README.md", "w", encoding="utf-8") as f:
-        f.write(readme)
+    readme += "## 🛍️ AI Skills & Prompts (Etsy Exclusives)\n"
+    for e in ETSY_EXCLUSIVES:
+        readme += f"### {e['name']}\n> {e['desc']}\n**[🛍️ View on Etsy]({e['url']})**\n\n---\n\n"
+
+    with open("README.md", "w", encoding="utf-8") as f: f.write(readme)
 
 GUIDE_TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>__TITLE__ - Production Python FastAPI + n8n Blueprint</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>__TITLE__ - Production Blueprint</title>
 <style>
 body { font-family: system-ui, sans-serif; background: #0f172a; color: #f8fafc; max-width: 860px; margin: 0 auto; padding: 40px 20px; line-height: 1.6; }
 .card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 28px; margin: 24px 0; }
 .btn { display: inline-block; background: #10b981; color: #052e16; font-weight: 700; padding: 15px 26px; border-radius: 8px; text-decoration: none; margin-top: 12px; }
-h1 { color: #fff; }
-h2 { color: #38bdf8; margin-top: 0; }
-code { background: #020617; padding: 3px 6px; border-radius: 4px; color: #38bdf8; }
+.btn-etsy { background: #f97316; color: #fff; margin-left: 10px; }
+h1 { color: #fff; } h2 { color: #38bdf8; margin-top: 0; }
 </style>
 </head>
 <body>
 <h1>__TITLE__: Self-Hosted Python FastAPI + n8n Blueprint</h1>
-<p>Engineering teams searching for <strong>__KEYWORD__</strong> often hit expensive SaaS paywalls. By combining Python FastAPI with self-hosted n8n, you achieve unlimited capacity at zero recurring fee.</p>
 <div class="card">
 <h2>Ready-to-Deploy Production Pack (__PRICE__ Flash Access)</h2>
-<p>Download the complete <strong>__PROD_NAME__</strong> blueprint including FastAPI microservice, 1-click importable n8n workflow, and setup guide.</p>
 <p>__PROD_DESC__</p>
-<a class="btn" href="__PROD_URL__">Download Complete Blueprint Pack (__PRICE__)</a>
+<a class="btn" href="__PROD_URL__">⚡ Download Blueprint (__PRICE__)</a>
+<a class="btn btn-etsy" href="__ETSY_URL__" target="_blank">🛍️ View Shop on Etsy</a>
 </div>
-<p><a style="color:#38bdf8" href="https://kritikosgns-web.github.io/">← Back to All Engines & ROI Calculator</a></p>
+<p><a style="color:#38bdf8" href="https://kritikosgns-web.github.io/">← Back to Storefront</a></p>
 </body>
 </html>"""
 
@@ -205,180 +155,125 @@ def auto_spawn_radar_pages(raw_keywords, catalog):
         if any(b in kw.lower() for b in BANNED_WORDS): continue
         slug = re.sub(r"[^a-z0-9]+", "-", kw.lower()).strip("-")[:55].strip("-")
         if len(slug) < 5: continue
-        fname = f"guide-{slug}.html"
         
-        if any(w in kw.lower() for w in ["invoice", "ocr", "pdf", "accounting", "vat"]): target = catalog.get("invoice", catalog.get("lead"))
-        elif any(w in kw.lower() for w in ["support", "ticket", "sla", "customer", "zendesk"]): target = catalog.get("support", catalog.get("lead"))
-        elif any(w in kw.lower() for w in ["siem", "secops", "waf", "security", "alert"]): target = catalog.get("secops", catalog.get("lead"))
-        else: target = catalog.get("lead")
+        target = catalog.get("lead")
+        if any(w in kw.lower() for w in ["invoice", "ocr"]): target = catalog.get("invoice", target)
+        elif any(w in kw.lower() for w in ["support", "ticket"]): target = catalog.get("support", target)
+        elif any(w in kw.lower() for w in ["siem", "secops"]): target = catalog.get("secops", target)
 
         if not target: continue
-        page_html = GUIDE_TEMPLATE.replace("__TITLE__", kw.title()).replace("__KEYWORD__", kw).replace("__PRICE__", target["price"]).replace("__PROD_NAME__", target["name"]).replace("__PROD_DESC__", target["desc"]).replace("__PROD_URL__", target["url"])
-        with open(fname, "w", encoding="utf-8") as f: f.write(page_html)
+        page_html = GUIDE_TEMPLATE.replace("__TITLE__", kw.title()).replace("__KEYWORD__", kw).replace("__PRICE__", target["price"]).replace("__PROD_NAME__", target["name"]).replace("__PROD_DESC__", target["desc"]).replace("__PROD_URL__", target["url"]).replace("__ETSY_URL__", ETSY_SHOP_URL)
+        with open(f"guide-{slug}.html", "w", encoding="utf-8") as f: f.write(page_html)
     return sorted(glob.glob("guide-*.html"))
 
 INDEX_TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Self-Hosted Python FastAPI + n8n Automation Suite</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>KritikosgnsStudio - Automation & AI Suite</title>
 <style>
 body { font-family: system-ui, sans-serif; background: #0f172a; color: #f8fafc; max-width: 920px; margin: 0 auto; padding: 40px 20px; line-height: 1.6; }
 .card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 28px; margin: 24px 0; }
-.calc { background: #020617; border: 2px solid #38bdf8; border-radius: 12px; padding: 24px; margin: 28px 0; }
 .badge { background: #f59e0b; color: #000; font-weight: 800; padding: 4px 10px; border-radius: 6px; font-size: 0.85rem; display: inline-block; margin-bottom: 8px; }
 .btn { display: inline-block; background: #10b981; color: #052e16; font-weight: 700; padding: 14px 24px; border-radius: 8px; text-decoration: none; margin-top: 10px; }
-h1 { color: #fff; }
-h2 { color: #38bdf8; margin-top: 0; }
-input[type=range] { width: 100%; margin: 12px 0; }
+.btn-etsy { background: #f97316; color: #fff; }
+h1 { color: #fff; } h2 { color: #38bdf8; margin-top: 0; }
 .prod-image { width: 100%; max-height: 400px; object-fit: cover; border-radius: 8px; margin-bottom: 15px; border: 1px solid #334155; }
 </style>
 </head>
 <body>
-<h1>Production-Ready Python FastAPI + n8n Automation Systems (__COUNT__ Live Engines)</h1>
-<p>Replace 300+ EUR/month SaaS subscriptions with self-hosted microservices and 1-click n8n blueprints.</p>
-<div class="calc">
-<h2>Interactive SaaS vs. Self-Hosted ROI Calculator</h2>
-<p>Monthly Processed Leads, Alerts, or Invoices: <b id="volLabel" style="color:#38bdf8">5,000</b> / month</p>
-<input type="range" id="volRange" min="1000" max="50000" step="1000" value="5000" oninput="updateRoi(this.value)">
-<p>Commercial SaaS Cost: <b id="saasCost" style="color:#ef4444">350 EUR / month</b></p>
-<p>Self-Hosted Cost: <b id="selfCost" style="color:#10b981">2.25 EUR / month</b></p>
-<p style="font-size:1.2rem">Annual Savings: <b id="yearSave" style="color:#10b981">4,173 EUR / year</b></p>
-</div>
-<script>
-function updateRoi(v) {
-    document.getElementById('volLabel').innerText = Number(v).toLocaleString();
-    var saas = Math.round(v * 0.07);
-    var self = (v * 0.00045).toFixed(2);
-    var save = Math.round((saas - self) * 12);
-    document.getElementById('saasCost').innerText = saas + ' EUR / month';
-    document.getElementById('selfCost').innerText = self + ' EUR / month';
-    document.getElementById('yearSave').innerText = save.toLocaleString() + ' EUR / year';
-}
-</script>
+<h1>Production-Ready Python FastAPI + n8n Blueprints</h1>
 __PRODUCT_CARDS__
-<div class="card" style="border-color:#10b981">
-<span class="badge" style="background:#10b981;color:#052e16">FREE OPEN-SOURCE UTILITY</span>
-<h2>Free CLI: n8n + FastAPI Webhook Load Tester</h2>
-<p>Test webhook latency, payloads, and response headers with zero dependencies.</p>
-<a class="btn" style="background:#38bdf8;color:#0f172a" href="https://kritikosgns-web.github.io/n8n-fastapi-cli.py" download>Download Free CLI</a>
-</div>
-<div class="card">
-<h2>Technical Implementation Guides</h2>
-<ul>
-__GUIDE_LINKS__
-</ul>
-</div>
+<h1 style="margin-top:50px;">Etsy Exclusives: AI & Claude Skills</h1>
+__ETSY_CARDS__
+<div class="card"><h2>Technical SEO Guides</h2><ul>__GUIDE_LINKS__</ul></div>
 </body>
 </html>"""
-
-def build_storefront_and_sitemap(product_cards_html, all_guides, prod_count):
-    guide_links_html = "".join(f'<li><a style="color:#38bdf8" href="https://kritikosgns-web.github.io/{g}">{g.replace("guide-","").replace(".html","").replace("-"," ").title()}</a></li>\n' for g in all_guides)
-    idx_html = INDEX_TEMPLATE.replace("__COUNT__", str(prod_count)).replace("__PRODUCT_CARDS__", product_cards_html).replace("__GUIDE_LINKS__", guide_links_html)
-    with open("index.html", "w", encoding="utf-8") as f: f.write(idx_html)
-
-    today_iso = datetime.datetime.utcnow().strftime("%Y-%m-%d")
-    base_urls = ["https://kritikosgns-web.github.io/"] + [f"https://kritikosgns-web.github.io/{g}" for g in all_guides]
-    url_entries = "".join(f"  <url><loc>{u}</loc><lastmod>{today_iso}</lastmod><priority>0.9</priority></url>\n" for u in base_urls)
-    sitemap = f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n{url_entries}</urlset>'
-    with open("sitemap.xml", "w", encoding="utf-8") as f: f.write(sitemap)
 
 DASHBOARD_TEMPLATE = """<!DOCTYPE html>
 <html>
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Pol Cloud Live Dashboard v8.0</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pol Cloud Live Dashboard v8.2</title>
 <style>
 body { font-family: system-ui, sans-serif; background: #0f172a; color: #f8fafc; padding: 24px; max-width: 920px; margin: 0 auto; }
 .box { background: #1e293b; padding: 20px; border-radius: 10px; margin-bottom: 18px; border: 1px solid #334155; }
-.btn { display: inline-block; background: #38bdf8; color: #0f172a; padding: 10px 18px; border-radius: 6px; text-decoration: none; font-weight: bold; margin-top: 8px; }
-h2 { color: #38bdf8; margin-top: 0; }
-a { color: #10b981; font-weight: bold; }
+h2 { color: #38bdf8; margin-top: 0; } a { color: #10b981; font-weight: bold; }
 </style>
 </head>
 <body>
-<h1>POL AUTONOMOUS ENGINE v8.0 (FINAL CORE)</h1>
+<h1>POL AUTONOMOUS ENGINE v8.2</h1>
 <div class="box">
-<h2>1. 1-Click Operator Command Center</h2>
-<p>Deploy a new keyword or SEO logic via Issue Title:</p>
-<a class="btn" href="https://github.com/kritikosgns-web/kritikosgns-web.github.io/issues/new?title=deploy+ai+customer+support+webhook+triage+n8n">⚡ 1-Click Deploy New Page via Issue</a>
-</div>
-<div class="box">
-<h2>2. Live Gumroad Portfolio & Auto-Pricing Status</h2>
-<p><b>Active Products:</b> __PROD_LEN__ | <b>Total Sales:</b> __SALES__ | <b>Net Revenue:</b> __REV__ USD</p>
+<h2>1. Live Gumroad Portfolio</h2>
+<p><b>Total Sales:</b> __SALES__ | <b>Net Revenue:</b> __REV__ USD</p>
 __ROWS__
 </div>
-<div class="box">
-<h2>3. Live Market Radar (Filtered B2B Buyer Signals)</h2>
-<ul>__SIGNALS__</ul>
+<div class="box" style="border-color:#f97316">
+<h2 style="color:#f97316">2. Etsy Exclusive Listings</h2>
+<ul>__ETSY_DASH__</ul>
 </div>
-<div class="box">
-<h2>4. Auto-Spawned B2B SEO Pages</h2>
-<p><b>Last Cloud Cycle:</b> __NOW__</p>
-<ul>__GUIDES__</ul>
-</div>
+<div class="box"><h2>3. Auto-Spawned SEO Pages</h2><ul>__GUIDES__</ul></div>
 </body>
 </html>"""
 
+def build_storefront_and_sitemap(product_cards_html, etsy_cards_html, all_guides, etsy_dash_html, rows, total_sales, total_rev):
+    guide_links_html = "".join(f'<li><a style="color:#38bdf8" href="https://kritikosgns-web.github.io/{g}">{g.replace("guide-","").replace(".html","").replace("-"," ").title()}</a></li>\n' for g in all_guides)
+    
+    idx_html = INDEX_TEMPLATE.replace("__PRODUCT_CARDS__", product_cards_html).replace("__ETSY_CARDS__", etsy_cards_html).replace("__GUIDE_LINKS__", guide_links_html)
+    with open("index.html", "w", encoding="utf-8") as f: f.write(idx_html)
+    
+    dash_html = DASHBOARD_TEMPLATE.replace("__SALES__", str(total_sales)).replace("__REV__", f"{total_rev:.2f}").replace("__ROWS__", rows).replace("__ETSY_DASH__", etsy_dash_html).replace("__GUIDES__", "".join(f'<li><a href="https://kritikosgns-web.github.io/{g}">{g}</a></li>\n' for g in all_guides))
+    with open("dashboard.html", "w", encoding="utf-8") as f: f.write(dash_html)
+
+    today_iso = datetime.datetime.utcnow().strftime("%Y-%m-%d")
+    base_urls = ["https://kritikosgns-web.github.io/"] + [f"https://kritikosgns-web.github.io/{g}" for g in all_guides]
+    with open("sitemap.xml", "w", encoding="utf-8") as f: 
+        f.write(f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join(f"  <url><loc>{u}</loc><lastmod>{today_iso}</lastmod></url>\n" for u in base_urls) + '</urlset>')
+
 def run_cycle():
-    spawn_open_source_cli()
-    extra_cmds = check_operator_commands()
-
     req = urllib.request.Request(f"https://api.gumroad.com/v2/products?access_token={GUMROAD_TOKEN}")
-    with urllib.request.urlopen(req) as resp:
-        prods = json.loads(resp.read().decode()).get("products", [])
+    with urllib.request.urlopen(req) as resp: prods = json.loads(resp.read().decode()).get("products", [])
 
+    extra_cmds = check_operator_commands()
     signals, raw_keywords = fetch_live_market_radar(extra_cmds)
-    signal_html = "".join(f"<li>{s}</li>\n" for s in signals)
-
+    
     total_sales = sum(int(p.get("sales_count", 0)) for p in prods)
     total_rev = sum(float(p.get("sales_usd_cents", 0)) / 100.0 for p in prods)
-
-    rows = ""
-    product_cards_html = ""
-    catalog = {}
-    catalog_data = []
+    rows, product_cards_html, catalog, catalog_data = "", "", {}, []
 
     for idx, p in enumerate(prods, 1):
         pname = p.get("name", "")
-        prev = float(p.get("sales_usd_cents", 0)) / 100.0
-        ptype, promo_url, price_tier_label, btn_price, psales, desc, compare_link = get_dynamic_pricing(p)
-        
-        # Pull the REAL image you uploaded to Gumroad
+        ptype, promo_url, price_tier_label, btn_price, psales, desc = get_dynamic_pricing(p)
         banner_url = p.get("preview_url") or p.get("thumbnail_url") or "https://via.placeholder.com/1280x720/1e293b/38bdf8?text=Image+Processing"
         
         catalog[ptype] = {"name": pname, "url": promo_url, "price": btn_price, "desc": desc}
         catalog_data.append({"name": pname, "desc": desc, "price": btn_price, "url": promo_url, "banner_url": banner_url})
 
-        rows += (
-            f'<div style="padding:14px;border-bottom:1px solid #334155">'
-            f'<b>{idx}. {pname}</b><br>'
-            f'Active Auto-Pricing: <span style="color:#f59e0b;font-weight:bold">{price_tier_label}</span><br>'
-            f'Sales: <b>{psales}</b> | Revenue: <b>{prev:.2f} USD</b><br>'
-            f'Active Checkout: <a style="color:#10b981" href="{promo_url}">{promo_url}</a></div>\n'
+        rows += f'<div style="padding:10px;border-bottom:1px solid #334155"><b>{pname}</b> - Sales: <b>{psales}</b> | Revenue: <b>{(float(p.get("sales_usd_cents", 0)) / 100.0):.2f} USD</b></div>\n'
+        
+        product_cards_html += (
+            f'<div class="card"><span class="badge">EARLY ADOPTER FLASH TIER ({btn_price})</span><br><br>'
+            f'<img src="{banner_url}" class="prod-image" alt="{pname}">'
+            f'<h2>{pname}</h2><p>{desc}</p>'
+            f'<a class="btn" href="{promo_url}">⚡ Get Instant Access ({btn_price})</a>'
+            f'</div>\n'
         )
 
-        product_cards_html += (
-            f'<div class="card">'
-            f'<span class="badge">EARLY ADOPTER FLASH TIER ({btn_price})</span><br><br>'
-            f'<img src="{banner_url}" class="prod-image" alt="{pname}">'
-            f'<h2>{idx}. {pname}</h2>'
-            f'<p>{desc}</p>'
-            f'<a class="btn" href="{promo_url}">Get Instant Access ({btn_price} Flash Download)</a>'
-            f' {compare_link}</div>\n'
-        )
+    # Build Etsy Cards
+    etsy_cards_html = "".join(
+        f'<div class="card" style="border-color:#f97316">'
+        f'<span class="badge" style="background:#f97316;color:#fff">ETSY EXCLUSIVE</span><br><br>'
+        f'<h2>{e["name"]}</h2><p>{e["desc"]}</p>'
+        f'<a class="btn btn-etsy" href="{e["url"]}" target="_blank" style="margin-left:0;">🛍️ View Details on Etsy</a>'
+        f'</div>\n'
+        for e in ETSY_EXCLUSIVES
+    )
+    
+    etsy_dash_html = "".join(f'<li><a href="{e["url"]}" style="color:#f97316" target="_blank">{e["name"]}</a></li>\n' for e in ETSY_EXCLUSIVES)
 
     build_github_readme(catalog_data)
     all_guides = auto_spawn_radar_pages(raw_keywords, catalog)
-    build_storefront_and_sitemap(product_cards_html, all_guides, len(prods))
-
-    guide_list_dash = "".join(f'<li><a href="https://kritikosgns-web.github.io/{g}">{g}</a></li>\n' for g in all_guides)
-    now_str = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
-
-    dash_html = DASHBOARD_TEMPLATE.replace("__PROD_LEN__", str(len(prods))).replace("__SALES__", str(total_sales)).replace("__REV__", f"{total_rev:.2f}").replace("__ROWS__", rows).replace("__SIGNALS__", signal_html).replace("__NOW__", now_str).replace("__GUIDES__", guide_list_dash)
-    with open("dashboard.html", "w", encoding="utf-8") as f: f.write(dash_html)
+    build_storefront_and_sitemap(product_cards_html, etsy_cards_html, all_guides, etsy_dash_html, rows, total_sales, total_rev)
 
 if __name__ == "__main__":
     run_cycle()
