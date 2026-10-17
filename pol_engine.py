@@ -1,6 +1,6 @@
 import os, re, glob, json, urllib.request, urllib.parse, datetime
 
-GUMROAD_TOKEN = "mBSxV_JH5SYm1t1qzwk" + "D58O6vQE1rI_qBYgY9v0TvSI"
+GUMROAD_TOKEN = os.environ.get("GUMROAD_TOKEN", "")  # GitHub Actions secret; never hard-code it
 REPO = "kritikosgns-web/kritikosgns-web.github.io"
 GH_TOKEN = os.environ.get("GITHUB_TOKEN", "")
 ETSY_SHOP_URL = "https://www.etsy.com/shop/KritikosgnsStudio"
@@ -10,12 +10,12 @@ ETSY_EXCLUSIVES = [
     {
         "name": "Claude Skills Bundle for Product Launch", 
         "url": "https://www.etsy.com/listing/4597283831/claude-skills-bundle-for-product-launch", 
-        "desc": "Optimize your product launches with advanced Claude AI prompt engineering and custom skills."
+        "desc": "8 tested SKILL.md files for Claude Code and Cowork: positioning, landing page copy, pricing page, launch plan, Product Hunt kit, community posts, launch emails and launch review."
     },
     {
-        "name": "Claude Code Skills Bundle", 
+        "name": "Claude Skills Bundle for Freelancers", 
         "url": "https://www.etsy.com/listing/4597264171/claude-code-skills-bundle-for", 
-        "desc": "Enhance your coding workflows, debugging, and AI-assisted development with specialized Claude code skills."
+        "desc": "10 tested SKILL.md files for Claude Code and Cowork that write proposals, price projects, review contracts, guard scope and chase unpaid invoices."
     }
 ]
 
@@ -41,6 +41,7 @@ def check_operator_commands():
         with urllib.request.urlopen(req, timeout=10) as r:
             issues = json.loads(r.read().decode())
             for iss in issues:
+                if iss.get("author_association") != "OWNER": continue  # public repo: ignore issues from others
                 title = iss.get("title", "").strip()
                 if title: commands.append(title)
                 creq = urllib.request.Request(
@@ -90,12 +91,25 @@ def get_dynamic_pricing(prod):
     pid = prod.get("id", "")
     pname = prod.get("name", "").lower()
 
+    # Claude skills packs: real price + real description, never an auto offer code
+    if "claude" in pname and "skill" in pname:
+        cents = int(prod.get("price", 0) or 0)
+        real_price = (f"{cents/100:.2f}".rstrip("0").rstrip(".") + " EUR") if cents else "see page"
+        if "launch" in pname:
+            desc = "8 tested SKILL.md files for Claude Code and Cowork: positioning, landing page, pricing page, launch plan, Product Hunt kit, community posts, launch emails, launch review."
+        else:
+            desc = "10 tested SKILL.md files for Claude Code and Cowork: proposals, pricing, contract review, onboarding, scope guard, status updates, invoice follow-up, weekly review, outreach, testimonials."
+        return "skills-" + str(pid or pname)[:12], purl, real_price, real_price, sales, desc
+
     if "qjimps" in purl or "lead" in pname:
         ptype, code, off_cents, btn_price = "lead", "FLASH19" if sales < 3 else "LAUNCH29" if sales < 9 else "", 2800, "19 EUR" if sales < 3 else "29 EUR" if sales < 9 else "47 EUR"
         desc = "Filters 100+ free email providers, live-scrapes domains without paid APIs, scores ICP fit via GPT-4o-mini."
     elif "eqdqfx" in purl or "invoice" in pname or "ocr" in pname:
         ptype, code, off_cents, btn_price = "invoice", "INVOICE21" if sales < 3 else "INVOICE34" if sales < 9 else "", 2800, "21 EUR" if sales < 3 else "34 EUR" if sales < 9 else "49 EUR"
         desc = "Extracts structured JSON data (VAT, Tax ID, Totals) from PDF invoices using Python FastAPI + OpenAI Vision."
+    elif "siem" in pname or "secops" in pname or "waf" in pname:
+        ptype, code, off_cents, btn_price = "secops", "SECOPS25" if sales < 3 else "SECOPS39" if sales < 9 else "", 3400, "25 EUR" if sales < 3 else "39 EUR" if sales < 9 else "59 EUR"
+        desc = "Eliminate 80% of SOC alert fatigue. Ingests SIEM/WAF webhooks, scores SQLi/LFI payloads, and triggers instant WAF block actions."
     elif "support" in pname or "ticket" in pname or "triage" in pname:
         ptype, code, off_cents, btn_price = "support", "SUPPORT19" if sales < 3 else "SUPPORT29" if sales < 9 else "", 2000, "19 EUR" if sales < 3 else "29 EUR" if sales < 9 else "39 EUR"
         desc = "Urgent support ticket triage. Ingests tickets, scores churn risk & sentiment, alerts Slack, and drafts AI replies."
@@ -231,6 +245,8 @@ def build_storefront_and_sitemap(product_cards_html, etsy_cards_html, all_guides
         f.write(f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join(f"  <url><loc>{u}</loc><lastmod>{today_iso}</lastmod></url>\n" for u in base_urls) + '</urlset>')
 
 def run_cycle():
+    if not GUMROAD_TOKEN:
+        raise SystemExit("GUMROAD_TOKEN secret is missing: add it in repo Settings > Secrets and variables > Actions")
     req = urllib.request.Request(f"https://api.gumroad.com/v2/products?access_token={GUMROAD_TOKEN}")
     with urllib.request.urlopen(req) as resp: prods = json.loads(resp.read().decode()).get("products", [])
 
