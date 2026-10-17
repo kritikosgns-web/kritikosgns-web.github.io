@@ -4,8 +4,8 @@ Replace 300+ EUR/month SaaS subscriptions with self-hosted Python FastAPI micros
 
 ## 📦 Production-Ready Engines (Gumroad)
 ### Indie Launch Skills for Claude Code — 8 Claude Skills to Position
-> Eliminate 80% of SOC alert fatigue. Ingests SIEM/WAF webhooks, scores SQLi/LFI payloads, and triggers instant WAF block actions.
-**[⚡ Download Blueprint (25 EUR)](https://kritikos12.gumroad.com/l/ppxgwi/SECOPS25)**
+> 8 tested SKILL.md files for Claude Code and Cowork: positioning, landing page, pricing page, launch plan, Product Hunt kit, community posts, launch emails, launch review.
+**[⚡ Download Blueprint (14.99 EUR)](https://kritikos12.gumroad.com/l/ppxgwi)**
 
 ---
 
@@ -16,8 +16,8 @@ Replace 300+ EUR/month SaaS subscriptions with self-hosted Python FastAPI micros
 ---
 
 ### Freelancer Ops Skills for Claude Code (10 installable skills)
-> Eliminate 80% of SOC alert fatigue. Ingests SIEM/WAF webhooks, scores SQLi/LFI payloads, and triggers instant WAF block actions.
-**[⚡ Download Blueprint (25 EUR)](https://kritikos12.gumroad.com/l/freelancer-ops-skills/SECOPS25)**
+> 10 tested SKILL.md files for Claude Code and Cowork: proposals, pricing, contract review, onboarding, scope guard, status updates, invoice follow-up, weekly review, outreach, testimonials.
+**[⚡ Download Blueprint (9 EUR)](https://kritikos12.gumroad.com/l/freelancer-ops-skills)**
 
 ---
 
@@ -28,8 +28,8 @@ Replace 300+ EUR/month SaaS subscriptions with self-hosted Python FastAPI micros
 ---
 
 ### Automated SecOps SIEM & WAF Alert Triage Engine (n8n + Python FastAPI)
-> Urgent support ticket triage. Ingests tickets, scores churn risk & sentiment, alerts Slack, and drafts AI replies.
-**[⚡ Download Blueprint (19 EUR)](https://kritikos12.gumroad.com/l/fauvaz/SUPPORT19)**
+> Eliminate 80% of SOC alert fatigue. Ingests SIEM/WAF webhooks, scores SQLi/LFI payloads, and triggers instant WAF block actions.
+**[⚡ Download Blueprint (25 EUR)](https://kritikos12.gumroad.com/l/fauvaz/SECOPS25)**
 
 ---
 
@@ -41,13 +41,13 @@ Replace 300+ EUR/month SaaS subscriptions with self-hosted Python FastAPI micros
 
 ## 🛍️ AI Skills & Prompts (Etsy Exclusives)
 ### Claude Skills Bundle for Product Launch
-> Optimize your product launches with advanced Claude AI prompt engineering and custom skills.
+> 8 tested SKILL.md files for Claude Code and Cowork: positioning, landing page copy, pricing page, launch plan, Product Hunt kit, community posts, launch emails and launch review.
 **[🛍️ View on Etsy](https://www.etsy.com/listing/4597283831/claude-skills-bundle-for-product-launch)**
 
 ---
 
-### Claude Code Skills Bundle
-> Enhance your coding workflows, debugging, and AI-assisted development with specialized Claude code skills.
+### Claude Skills Bundle for Freelancers
+> 10 tested SKILL.md files for Claude Code and Cowork that write proposals, price projects, review contracts, guard scope and chase unpaid invoices.
 **[🛍️ View on Etsy](https://www.etsy.com/listing/4597264171/claude-code-skills-bundle-for)**
 
 ---
