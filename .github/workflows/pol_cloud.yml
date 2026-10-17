@@ -26,6 +26,7 @@ jobs:
       - name: Execute Pol Self-Evolving Engine
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GUMROAD_TOKEN: ${{ secrets.GUMROAD_TOKEN }}
         run: python pol_engine.py
       - name: Commit All Autonomous Deployments
         run: |
