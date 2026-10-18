@@ -15,7 +15,7 @@ Replace 300+ EUR/month SaaS subscriptions with self-hosted Python FastAPI micros
 
 ---
 
-### Freelancer Ops Skills for Claude Code (10 installable skills)
+### Claude Skills Bundle for Freelancers: 10 Claude Code Agent Skills for Proposals, Pricing, Contracts & Invoices
 > 10 tested SKILL.md files for Claude Code and Cowork: proposals, pricing, contract review, onboarding, scope guard, status updates, invoice follow-up, weekly review, outreach, testimonials.
 **[⚡ Download Blueprint (9 EUR)](https://kritikos12.gumroad.com/l/freelancer-ops-skills)**
 
