@@ -3,6 +3,12 @@
 Replace 300+ EUR/month SaaS subscriptions with self-hosted Python FastAPI microservices and 1-click importable n8n workflows.
 
 ## 📦 Production-Ready Engines (Gumroad)
+### Claude Skills Complete Bundle: 18 Claude Code Agent Skills for Freelancers & Product Launches
+> 8 tested SKILL.md files for Claude Code and Cowork: positioning, landing page, pricing page, launch plan, Product Hunt kit, community posts, launch emails, launch review.
+**[⚡ Download Blueprint (19 EUR)](https://kritikos12.gumroad.com/l/claude-skills-complete)**
+
+---
+
 ### Indie Launch Skills for Claude Code — 8 Claude Skills to Position
 > 8 tested SKILL.md files for Claude Code and Cowork: positioning, landing page, pricing page, launch plan, Product Hunt kit, community posts, launch emails, launch review.
 **[⚡ Download Blueprint (14.99 EUR)](https://kritikos12.gumroad.com/l/ppxgwi)**
