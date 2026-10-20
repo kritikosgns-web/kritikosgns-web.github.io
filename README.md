@@ -3,6 +3,18 @@
 Replace 300+ EUR/month SaaS subscriptions with self-hosted Python FastAPI microservices and 1-click importable n8n workflows.
 
 ## 📦 Production-Ready Engines (Gumroad)
+### M365 Hardening Kit: Complete (58 controls)
+> Eliminate 80% of SOC alert fatigue. Ingests SIEM/WAF webhooks, scores SQLi/LFI payloads, and triggers instant WAF block actions.
+**[⚡ Download Blueprint (25 EUR)](https://kritikos12.gumroad.com/l/m365-hardening-kit/SECOPS25)**
+
+---
+
+### M365 Hardening Kit: Emergency Top 10
+> Eliminate 80% of SOC alert fatigue. Ingests SIEM/WAF webhooks, scores SQLi/LFI payloads, and triggers instant WAF block actions.
+**[⚡ Download Blueprint (25 EUR)](https://kritikos12.gumroad.com/l/m365-hardening-top10/SECOPS25)**
+
+---
+
 ### Claude Skills Complete Bundle: 18 Claude Code Agent Skills for Freelancers & Product Launches
 > 8 tested SKILL.md files for Claude Code and Cowork: positioning, landing page, pricing page, launch plan, Product Hunt kit, community posts, launch emails, launch review.
 **[⚡ Download Blueprint (19 EUR)](https://kritikos12.gumroad.com/l/claude-skills-complete)**
