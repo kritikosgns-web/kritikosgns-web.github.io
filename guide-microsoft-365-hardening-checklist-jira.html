@@ -38,7 +38,7 @@ a{color:var(--a1)}
 <div class="grid">
 <div class="card best"><span class="tag">Early November 2026</span><h3>Teams external chats: file sharing on by default</h3><p class="muted">MC1479514: tenants that have not set the policy get attachments in federated chats, with automatic permission grants. Decide now.</p><pre>Get-CsTeamsFilesPolicy -Identity Global |
   Select FileSharingInChatsWithExternalUsers</pre></div>
-<div class="card best"><span class="tag">Late December 2026</span><h3>SMTP AUTH Basic auth off by default</h3><p class="muted">Printers, scanners and apps that send with a username and password stop working. Find them first.</p><pre>Get-TransportConfig |
+<div class="card best"><span class="tag">Late December 2026</span><h3>SMTP AUTH Basic auth off by default</h3><p class="muted">Printers, scanners and apps that send with a username and password stop working. Find them first: <a href="https://kritikosgns-web.github.io/guide-exchange-online-smtp-auth-basic-auth-checklist.html">six-step SMTP AUTH checklist</a>.</p><pre>Get-TransportConfig |
   Select SmtpClientAuthenticationDisabled</pre></div>
 </div>
 
