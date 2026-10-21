@@ -5,55 +5,55 @@ Replace 300+ EUR/month SaaS subscriptions with self-hosted Python FastAPI micros
 ## 📦 Production-Ready Engines (Gumroad)
 ### M365 Hardening Kit: Complete (58 controls)
 > Eliminate 80% of SOC alert fatigue. Ingests SIEM/WAF webhooks, scores SQLi/LFI payloads, and triggers instant WAF block actions.
-**[⚡ Download Blueprint (25 EUR)](https://kritikos12.gumroad.com/l/m365-hardening-kit/SECOPS25)**
+**[⚡ Download Blueprint (25 EUR)](https://gumroad.com/l/m365-hardening-kit/SECOPS25)**
 
 ---
 
 ### M365 Hardening Kit: Emergency Top 10
 > Eliminate 80% of SOC alert fatigue. Ingests SIEM/WAF webhooks, scores SQLi/LFI payloads, and triggers instant WAF block actions.
-**[⚡ Download Blueprint (25 EUR)](https://kritikos12.gumroad.com/l/m365-hardening-top10/SECOPS25)**
+**[⚡ Download Blueprint (25 EUR)](https://gumroad.com/l/m365-hardening-top10/SECOPS25)**
 
 ---
 
 ### Claude Skills Complete Bundle: 18 Claude Code Agent Skills for Freelancers & Product Launches
 > 8 tested SKILL.md files for Claude Code and Cowork: positioning, landing page, pricing page, launch plan, Product Hunt kit, community posts, launch emails, launch review.
-**[⚡ Download Blueprint (19 EUR)](https://kritikos12.gumroad.com/l/claude-skills-complete)**
+**[⚡ Download Blueprint (19 EUR)](https://gumroad.com/l/claude-skills-complete)**
 
 ---
 
 ### Indie Launch Skills for Claude Code — 8 Claude Skills to Position
 > 8 tested SKILL.md files for Claude Code and Cowork: positioning, landing page, pricing page, launch plan, Product Hunt kit, community posts, launch emails, launch review.
-**[⚡ Download Blueprint (14.99 EUR)](https://kritikos12.gumroad.com/l/ppxgwi)**
+**[⚡ Download Blueprint (14.99 EUR)](https://gumroad.com/l/ppxgwi)**
 
 ---
 
 ### AI Support Ticket Triage & SLA Escalator (n8n + Python)
 > Urgent support ticket triage. Ingests tickets, scores churn risk & sentiment, alerts Slack, and drafts AI replies.
-**[⚡ Download Blueprint (19 EUR)](https://kritikos12.gumroad.com/l/gbwmqo/SUPPORT19)**
+**[⚡ Download Blueprint (19 EUR)](https://gumroad.com/l/gbwmqo/SUPPORT19)**
 
 ---
 
 ### Claude Skills Bundle for Freelancers: 10 Claude Code Agent Skills for Proposals, Pricing, Contracts & Invoices
 > 10 tested SKILL.md files for Claude Code and Cowork: proposals, pricing, contract review, onboarding, scope guard, status updates, invoice follow-up, weekly review, outreach, testimonials.
-**[⚡ Download Blueprint (9 EUR)](https://kritikos12.gumroad.com/l/freelancer-ops-skills)**
+**[⚡ Download Blueprint (9 EUR)](https://gumroad.com/l/freelancer-ops-skills)**
 
 ---
 
 ### Automated PDF Invoice OCR & Accounting Pipeline (n8n + Python)
 > Extracts structured JSON data (VAT, Tax ID, Totals) from PDF invoices using Python FastAPI + OpenAI Vision.
-**[⚡ Download Blueprint (21 EUR)](https://kritikos12.gumroad.com/l/eqdqfx/INVOICE21)**
+**[⚡ Download Blueprint (21 EUR)](https://gumroad.com/l/eqdqfx/INVOICE21)**
 
 ---
 
 ### Automated SecOps SIEM & WAF Alert Triage Engine (n8n + Python FastAPI)
 > Eliminate 80% of SOC alert fatigue. Ingests SIEM/WAF webhooks, scores SQLi/LFI payloads, and triggers instant WAF block actions.
-**[⚡ Download Blueprint (25 EUR)](https://kritikos12.gumroad.com/l/fauvaz/SECOPS25)**
+**[⚡ Download Blueprint (25 EUR)](https://gumroad.com/l/fauvaz/SECOPS25)**
 
 ---
 
 ### B2B Lead Triage & AI Enrichment Engine (n8n + Python)
 > Filters 100+ free email providers, live-scrapes domains without paid APIs, scores ICP fit via GPT-4o-mini.
-**[⚡ Download Blueprint (19 EUR)](https://kritikos12.gumroad.com/l/qjimps/FLASH19)**
+**[⚡ Download Blueprint (19 EUR)](https://gumroad.com/l/qjimps/FLASH19)**
 
 ---
 

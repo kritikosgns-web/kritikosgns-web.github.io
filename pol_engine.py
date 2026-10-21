@@ -1,9 +1,9 @@
 import os, re, glob, json, urllib.request, urllib.parse, datetime
 
 GUMROAD_TOKEN = os.environ.get("GUMROAD_TOKEN", "")  # GitHub Actions secret; never hard-code it
-REPO = "kritikosgns-web/kritikosgns-web.github.io"
+REPO = "runbooklabhq/runbooklabhq.github.io"
 GH_TOKEN = os.environ.get("GITHUB_TOKEN", "")
-ETSY_SHOP_URL = "https://www.etsy.com/shop/KritikosgnsStudio"
+ETSY_SHOP_URL = "https://www.etsy.com/shop/RunbookLab"
 
 # --- ETSY EXCLUSIVE LISTINGS ---
 ETSY_EXCLUSIVES = [
@@ -159,7 +159,7 @@ h1 { color: #fff; } h2 { color: #38bdf8; margin-top: 0; }
 <a class="btn" href="__PROD_URL__">⚡ Download Blueprint (__PRICE__)</a>
 <a class="btn btn-etsy" href="__ETSY_URL__" target="_blank">🛍️ View Shop on Etsy</a>
 </div>
-<p><a style="color:#38bdf8" href="https://kritikosgns-web.github.io/">← Back to Storefront</a></p>
+<p><a style="color:#38bdf8" href="https://runbooklabhq.github.io/">← Back to Storefront</a></p>
 </body>
 </html>"""
 
@@ -184,7 +184,7 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>KritikosgnsStudio - Automation & AI Suite</title>
+<title>Runbook Lab - Automation & AI Suite</title>
 <style>
 body { font-family: system-ui, sans-serif; background: #0f172a; color: #f8fafc; max-width: 920px; margin: 0 auto; padding: 40px 20px; line-height: 1.6; }
 .card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 28px; margin: 24px 0; }
@@ -231,16 +231,16 @@ __ROWS__
 </html>"""
 
 def build_storefront_and_sitemap(product_cards_html, etsy_cards_html, all_guides, etsy_dash_html, rows, total_sales, total_rev):
-    guide_links_html = "".join(f'<li><a style="color:#38bdf8" href="https://kritikosgns-web.github.io/{g}">{g.replace("guide-","").replace(".html","").replace("-"," ").title()}</a></li>\n' for g in all_guides)
+    guide_links_html = "".join(f'<li><a style="color:#38bdf8" href="https://runbooklabhq.github.io/{g}">{g.replace("guide-","").replace(".html","").replace("-"," ").title()}</a></li>\n' for g in all_guides)
     
     idx_html = INDEX_TEMPLATE.replace("__PRODUCT_CARDS__", product_cards_html).replace("__ETSY_CARDS__", etsy_cards_html).replace("__GUIDE_LINKS__", guide_links_html)
     with open("index.html", "w", encoding="utf-8") as f: f.write(idx_html)
     
-    dash_html = DASHBOARD_TEMPLATE.replace("__SALES__", str(total_sales)).replace("__REV__", f"{total_rev:.2f}").replace("__ROWS__", rows).replace("__ETSY_DASH__", etsy_dash_html).replace("__GUIDES__", "".join(f'<li><a href="https://kritikosgns-web.github.io/{g}">{g}</a></li>\n' for g in all_guides))
+    dash_html = DASHBOARD_TEMPLATE.replace("__SALES__", str(total_sales)).replace("__REV__", f"{total_rev:.2f}").replace("__ROWS__", rows).replace("__ETSY_DASH__", etsy_dash_html).replace("__GUIDES__", "".join(f'<li><a href="https://runbooklabhq.github.io/{g}">{g}</a></li>\n' for g in all_guides))
     with open("dashboard.html", "w", encoding="utf-8") as f: f.write(dash_html)
 
     today_iso = datetime.datetime.utcnow().strftime("%Y-%m-%d")
-    base_urls = ["https://kritikosgns-web.github.io/"] + [f"https://kritikosgns-web.github.io/{g}" for g in all_guides]
+    base_urls = ["https://runbooklabhq.github.io/"] + [f"https://runbooklabhq.github.io/{g}" for g in all_guides]
     with open("sitemap.xml", "w", encoding="utf-8") as f: 
         f.write(f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join(f"  <url><loc>{u}</loc><lastmod>{today_iso}</lastmod></url>\n" for u in base_urls) + '</urlset>')
 

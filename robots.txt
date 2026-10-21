@@ -1,3 +1,3 @@
 User-agent: *
 Allow: /
-Sitemap: https://kritikosgns-web.github.io/sitemap.xml
+Sitemap: https://runbooklabhq.github.io/sitemap.xml
