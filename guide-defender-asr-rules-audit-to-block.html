@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Defender ASR Rules: Audit to Block Rollout Checklist | Runbook Lab</title>
+<meta name="description" content="Roll out Microsoft Defender attack surface reduction (ASR) rules without breaking line-of-business apps: read-only checks, an Advanced hunting query for audit events, exclusions that stay narrow, and a ring plan from Audit to Warn to Block.">
+<link rel="canonical" href="https://runbooklabhq.github.io/guide-defender-asr-rules-audit-to-block.html">
+<meta property="og:title" content="Defender ASR rules: from Audit to Block without breaking things">
+<meta property="og:description" content="Read-only checks, a KQL query for ASR audit events and a four-ring rollout plan.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@600;800&family=Inter:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Should I turn on attack surface reduction rules in Block mode straight away?", "acceptedAnswer": {"@type": "Answer", "text": "No. Start every rule in Audit mode for two to four weeks, review what would have been blocked, add narrow exclusions for legitimate tools, then move rules to Warn or Block in rings: IT devices first, then a pilot group, then everyone."}}, {"@type": "Question", "name": "How do I see which ASR rules are active on a Windows device?", "acceptedAnswer": {"@type": "Answer", "text": "Run Get-MpPreference in PowerShell and read AttackSurfaceReductionRules_Ids and AttackSurfaceReductionRules_Actions. The action values are 0 = off, 1 = Block, 2 = Audit, 6 = Warn. This only reads settings and changes nothing."}}, {"@type": "Question", "name": "How do I find ASR audit events in Microsoft Defender?", "acceptedAnswer": {"@type": "Answer", "text": "In Advanced hunting, query DeviceEvents where ActionType starts with Asr. Events ending in Audited are what the rule would have blocked; events ending in Blocked were stopped. Group by rule, file and initiating process to find the noisy ones."}}, {"@type": "Question", "name": "Which ASR rules are safest to block first?", "acceptedAnswer": {"@type": "Answer", "text": "Microsoft lists three standard protection rules with minimal compatibility impact: Block credential stealing from the Windows local security authority subsystem (LSASS), Block abuse of exploited vulnerable signed drivers, and Block persistence through WMI event subscription. Still audit them first in your own environment."}}]}</script>
+<style>
+:root{--bg:#050d18;--card:#0b1726;--line:#16283d;--ink:#e6f6ff;--muted:#8aa4b8;--a1:#a78bfa;--a2:#6366f1;--v:#8b5cf6}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Inter,system-ui,sans-serif}
+.wrap{max-width:960px;margin:0 auto;padding:40px 16px 64px}
+h1,h2{font-family:"Exo 2",sans-serif;line-height:1.15;margin:0 0 12px}h1{font-size:clamp(30px,6vw,46px)}h2{font-size:26px;margin-top:48px}
+.grad{background:linear-gradient(90deg,var(--a1),var(--a2));-webkit-background-clip:text;background-clip:text;color:transparent}
+p.lead{color:var(--muted);font-size:18px;max-width:680px}
+.btn{display:inline-block;padding:12px 20px;border-radius:10px;font-weight:600;text-decoration:none;margin:6px 8px 6px 0}
+.btn.p{background:linear-gradient(90deg,var(--a1),var(--a2));color:#04121f}.btn.s{border:1px solid var(--line);color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+.card h3{margin:0 0 6px;font-size:18px}.price{font-family:"Exo 2";font-size:28px;font-weight:800}.muted{color:var(--muted);font-size:14px}
+.best{border-color:var(--v);box-shadow:0 0 0 1px var(--v)}.tag{display:inline-block;font-size:12px;background:var(--v);color:#fff;border-radius:6px;padding:2px 8px;margin-bottom:8px}
+pre{background:#020812;border:1px solid var(--line);border-radius:10px;padding:14px;overflow-x:auto;font:14px/1.5 "JetBrains Mono",monospace;color:var(--a1)}
+table{width:100%;border-collapse:collapse;font-size:15px}td,th{text-align:left;padding:8px;border-bottom:1px solid var(--line);vertical-align:top}th{color:var(--muted);font-weight:600}
+code{font-family:"JetBrains Mono",monospace;font-size:14px;color:var(--a1)}footer{margin-top:56px;color:var(--muted);font-size:13px}
+a{color:var(--a1)}
+</style>
+</head><body><div class="wrap">
+<p class="muted">Runbook Lab · Security · Updated October 2026</p>
+<h1>Defender ASR rules: <span class="grad">from Audit to Block without breaking things</span></h1>
+<p class="lead">Attack surface reduction rules stop Office macros, scripts and credential theft before they run. Turned on in Block mode all at once, they also stop the finance team's macro and the backup agent. Six steps to roll them out in rings, starting with read-only checks.</p>
+<a class="btn p" href="https://gumroad.com/l/m365-hardening-top10?utm_source=storefront&amp;utm_campaign=asr-lp">Get the free M365 Top 10 tracker</a>
+<a class="btn s" href="https://github.com/runbooklabhq/m365-hardening-kit-free">View on GitHub</a>
+
+<h2>Before you start</h2>
+<table><tr><th>Check</th><th>Why</th></tr>
+<tr><td>Microsoft Defender Antivirus is the active antivirus with real-time protection on</td><td>ASR rules do nothing when another antivirus is primary or Defender runs in passive mode.</td></tr>
+<tr><td>Devices are onboarded to Defender for Endpoint or Defender for Business</td><td>Without onboarding you get no central reporting, so Audit mode tells you nothing.</td></tr>
+<tr><td>One policy source per device (Intune, Group Policy or Configuration Manager)</td><td>Two sources setting the same rule is the most common cause of "the rule is on but nothing happens".</td></tr></table>
+
+<h2>The six steps</h2>
+<div class="grid">
+<div class="card"><h3>1. Read what is set today</h3><p class="muted">Read-only, on a sample device. Actions: <code>0</code> off, <code>1</code> Block, <code>2</code> Audit, <code>6</code> Warn.</p><pre>$p = Get-MpPreference
+$i = 0
+foreach ($id in $p.AttackSurfaceReductionRules_Ids) {
+  [pscustomobject]@{ Rule = $id
+    Action = $p.AttackSurfaceReductionRules_Actions[$i] }
+  $i++ }</pre></div>
+<div class="card"><h3>2. Put every rule in Audit</h3><p class="muted">Intune &gt; Endpoint security &gt; Attack surface reduction &gt; create an ASR rules policy, all rules on <b>Audit</b>, assigned to all devices. Leave it for two to four weeks so month-end jobs show up too.</p></div>
+<div class="card"><h3>3. Find the noisy rules</h3><p class="muted">Defender portal &gt; Advanced hunting (Plan 2 / E5). On Business Premium use Reports &gt; Attack surface reduction rules instead.</p><pre>DeviceEvents
+| where Timestamp &gt; ago(30d)
+| where ActionType startswith "Asr"
+| summarize Events = count(), Devices = dcount(DeviceId)
+    by ActionType, FileName, InitiatingProcessFileName
+| order by Events desc</pre></div>
+<div class="card"><h3>4. Add narrow exclusions</h3><p class="muted">One exclusion per legitimate tool, as a full file path, per rule where you can. No folder-wide or wildcard exclusions, and never exclude a whole user profile. Give every exclusion an owner and a review date in your tracker.</p></div>
+<div class="card"><h3>5. Move to Warn, then Block, in rings</h3><p class="muted">Ring 0: IT devices. Ring 1: a pilot group of 5&ndash;10% of users. Ring 2: everyone. Warn lets a user unblock once, so it shows you what still breaks; a few rules don't support Warn, so check Microsoft's rule reference.</p></div>
+<div class="card"><h3>6. Keep watching</h3><p class="muted">Re-run the step 3 query weekly. A rule that suddenly fires hundreds of times a day is either a new tool that needs an exclusion or an attack. Both need an owner.</p></div>
+</div>
+
+<h2>Which rules go first</h2>
+<table><tr><th>Rule</th><th>GUID</th><th>Suggested ring to Block</th></tr><tr><td>Block credential stealing from LSASS</td><td><code>9e6c4e1f-7d60-472f-ba1a-a39ef669e4b2</code></td><td>Standard protection</td></tr><tr><td>Block abuse of exploited vulnerable signed drivers</td><td><code>56a863a9-875e-4185-98a7-b882c64b5ce5</code></td><td>Standard protection</td></tr><tr><td>Block persistence through WMI event subscription</td><td><code>e6db77e5-3df2-4cf1-b95a-636979351e5b</code></td><td>Standard protection</td></tr><tr><td>Block executable content from email client and webmail</td><td><code>be9ba2d9-53ea-4cdc-84e5-9b1eeee46550</code></td><td>Ring 2</td></tr><tr><td>Block all Office applications from creating child processes</td><td><code>d4f940ab-401b-4efc-aadc-ad5f3c50688a</code></td><td>Ring 2 (macro-heavy teams last)</td></tr><tr><td>Block Office applications from creating executable content</td><td><code>3b576869-a4ec-4529-8536-b80a7769e899</code></td><td>Ring 2</td></tr><tr><td>Block execution of potentially obfuscated scripts</td><td><code>5beb7efe-fd9a-4556-801d-275e5ffc04cc</code></td><td>Ring 3 (admin scripts)</td></tr><tr><td>Block process creations from PSExec and WMI commands</td><td><code>d1e49aac-8f56-4280-b9ba-993a6d77406c</code></td><td>Ring 3 (breaks some management tools)</td></tr></table>
+<p class="muted">The first three are Microsoft's "standard protection" rules, with minimal compatibility impact. Audit them anyway. Full list and the rules that don't support Warn: Microsoft Learn, "Attack surface reduction rules reference".</p>
+
+<h2>ASR covers the endpoints. Now the tenant.</h2>
+<p class="muted">ASR rules protect Windows devices. Most Microsoft 365 incidents still start in the tenant: no MFA, legacy authentication left on, external forwarding, a missing break-glass account. The free Microsoft 365 Emergency Top 10 turns those ten controls into a Jira import, a tracker CSV and read-only PowerShell checks.</p>
+<a class="btn p" href="https://gumroad.com/l/m365-hardening-top10?utm_source=storefront&amp;utm_campaign=asr-lp">Download the free Top 10</a>
+<a class="btn s" href="https://runbooklabhq.github.io/guide-microsoft-365-hardening-checklist-jira.html">See all 10 controls</a>
+<p class="muted">Need the whole tenant? The <a href="https://gumroad.com/l/m365-hardening-kit?utm_source=storefront&amp;utm_campaign=asr-lp">M365 Hardening Kit: Complete</a> has 58 controls in 5 sprints and 48 read-only checks · €39.</p>
+
+<h2>FAQ</h2>
+<h3>Should I turn on attack surface reduction rules in Block mode straight away?</h3><p class='muted'>No. Start every rule in Audit mode for two to four weeks, review what would have been blocked, add narrow exclusions for legitimate tools, then move rules to Warn or Block in rings: IT devices first, then a pilot group, then everyone.</p><h3>How do I see which ASR rules are active on a Windows device?</h3><p class='muted'>Run Get-MpPreference in PowerShell and read AttackSurfaceReductionRules_Ids and AttackSurfaceReductionRules_Actions. The action values are 0 = off, 1 = Block, 2 = Audit, 6 = Warn. This only reads settings and changes nothing.</p><h3>How do I find ASR audit events in Microsoft Defender?</h3><p class='muted'>In Advanced hunting, query DeviceEvents where ActionType starts with Asr. Events ending in Audited are what the rule would have blocked; events ending in Blocked were stopped. Group by rule, file and initiating process to find the noisy ones.</p><h3>Which ASR rules are safest to block first?</h3><p class='muted'>Microsoft lists three standard protection rules with minimal compatibility impact: Block credential stealing from the Windows local security authority subsystem (LSASS), Block abuse of exploited vulnerable signed drivers, and Block persistence through WMI event subscription. Still audit them first in your own environment.</p>
+<footer>© Runbook Lab · Not affiliated with or endorsed by Microsoft. Test every change on a pilot group first. · <a href="https://runbooklabhq.github.io/">Storefront</a> · <a href="https://runbooklabhq.github.io/guide-microsoft-365-hardening-checklist-jira.html">Microsoft 365 hardening checklist</a> · <a href="https://runbooklabhq.github.io/guide-exchange-online-smtp-auth-basic-auth-checklist.html">SMTP AUTH checklist</a></footer>
+</div></body></html>
